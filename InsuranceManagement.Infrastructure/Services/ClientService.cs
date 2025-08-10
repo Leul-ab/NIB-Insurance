@@ -26,7 +26,7 @@ namespace InsuranceManagement.Infrastructure.Services
         }
         public async Task<ClientResponse> RegisterClientAsync(ClientRegisterRequest request)
         {
-            if (await _context.Clients.AnyAsync(c => c.Email == request.Email))
+            if (await _context.Clients.AnyAsync(c => c.User.Email == request.Email))
                 throw new Exception("Client with this email already exists.");
 
             var passwordHasher = new PasswordHasher<User>();
@@ -46,9 +46,8 @@ namespace InsuranceManagement.Infrastructure.Services
             {
                 Id = Guid.NewGuid(),
                 FullName = request.FullName,
-                Email = request.Email,
-                PasswordHash = user.PasswordHash,
-                PhoneNumber = request.PhoneNumber,
+                
+                MobliePhone = request.MobilePhone,
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true,
                 UserId = user.Id,
@@ -63,8 +62,8 @@ namespace InsuranceManagement.Infrastructure.Services
             {
                 Id = client.Id,
                 FullName = client.FullName,
-                Email = client.Email,
-                PhoneNumber = client.PhoneNumber,
+                Email = client.User.Email,
+                MobliePhone = client.MobliePhone,
                 CreatedAt = client.CreatedAt
             };
         }

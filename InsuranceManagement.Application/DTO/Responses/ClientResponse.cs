@@ -12,7 +12,7 @@ namespace InsuranceManagement.Application.DTO.Responses
         public string FullName { get; set; } = default!;
         public string Email { get; set; } = default!;
         public string PasswordHash { get; set; } = default!;
-        public string PhoneNumber { get; set; } = default!;
+        public string MobliePhone { get; set; } = default!;
         public DateTime CreatedAt { get; set; }
     }
 }

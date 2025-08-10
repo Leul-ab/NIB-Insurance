@@ -10,20 +10,23 @@ namespace InsuranceManagement.Domain.Entities
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        public string LogoImageUrl { get; set; } = string.Empty;
 
-        
+        //Personal info
+        public string LogoImageUrl { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
         public string MobilePhone { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        public string? ImageUrl { get; set; }
         public bool IsActive { get; set; } = false;
-        public string PasswordHash { get; set; } = string.Empty;
 
+
+        //location
         public string Region { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string SubCity { get; set; } = string.Empty;
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+
+
 
         public DateTime CreatedAt { get; set; }
 

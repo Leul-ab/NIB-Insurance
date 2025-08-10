@@ -33,7 +33,7 @@ namespace InsuranceManagement.Infrastructure.Services
             {
                 Id = Guid.NewGuid(),
                 Email = request.Email,
-                UserName = request.Email, 
+                UserName = request.UserName, 
                 Role = Domain.Enums.UserRole.Operator,
             };
             user.PasswordHash = passwordHasher.HashPassword(user, request.PasswordHash);
@@ -42,9 +42,8 @@ namespace InsuranceManagement.Infrastructure.Services
             {
                 Id = Guid.NewGuid(),
                 FullName = request.FullName,
-                MobilePhone = request.MobilePhone,
-                Email = request.Email,
-                PasswordHash = user.PasswordHash,
+                MobilePhone = request.MobilePhone, 
+                ImageUrl = request.ImageUrl,
                 User = user,
                 Categories = categories
             };
@@ -55,8 +54,12 @@ namespace InsuranceManagement.Infrastructure.Services
             return new OperatorResponse
             {
                 Id = operatorEntity.Id,
+                Email = user.Email,
+                ImageUrl = operatorEntity.ImageUrl,
+                UserName = user.UserName,
                 FullName = operatorEntity.FullName,
-                CategoryNames = categories.Select(c => c.Name).ToList()
+                CategoryNames = categories.Select(c => c.Name).ToList(),
+                MobilePhone = operatorEntity.MobilePhone
             };
         }
 
@@ -74,14 +77,17 @@ namespace InsuranceManagement.Infrastructure.Services
         {
             var operators = await _context.Operators
                 .Include(o => o.Categories)
+                .Include(o => o.User)
                 .ToListAsync();
 
             return operators.Select(op => new OperatorResponse
             {
                 Id = op.Id,
+                UserName = op.User.UserName,
+                Email = op.User.Email,
                 FullName = op.FullName,
                 MobilePhone = op.MobilePhone,
-                Email = op.Email,
+                ImageUrl = op.ImageUrl,
                 CategoryNames = op.Categories.Select(c => c.Name).ToList()
             });
         }
@@ -90,6 +96,7 @@ namespace InsuranceManagement.Infrastructure.Services
         {
             var op = await _context.Operators
                 .Include(o => o.Categories)
+                .Include(o => o.User)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if(op == null) return null;
@@ -99,7 +106,8 @@ namespace InsuranceManagement.Infrastructure.Services
                 Id = op.Id,
                 FullName = op.FullName,
                 MobilePhone = op.MobilePhone,
-                Email = op.Email,
+                Email = op.User.Email,
+                ImageUrl= op.ImageUrl,
                 CategoryNames = op.Categories.Select(c => c.Name).ToList()
             };
         }
@@ -110,6 +118,7 @@ namespace InsuranceManagement.Infrastructure.Services
         {
             var op = await _context.Operators
                 .Include(o => o.Categories)
+                .Include(o => o.User)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (op == null) return false;
@@ -141,6 +150,8 @@ namespace InsuranceManagement.Infrastructure.Services
             return unassigned.Select(o => new OperatorResponse
             {
                 Id = o.Id,
+                UserName = o.User.UserName,
+                Email = o.User.Email,
                 FullName = o.FullName,
                 CategoryNames = new List<string>()
             });

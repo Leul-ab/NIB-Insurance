@@ -13,18 +13,41 @@ namespace InsuranceManagement.API.Controllers
     {
         private readonly ICategoryService _categoryService;
         private readonly IOperatorService _operatorService;
+        private readonly IWebHostEnvironment _env;
 
-        public AdminController(ICategoryService categoryService, IOperatorService operatorService)
+        public AdminController(ICategoryService categoryService, IOperatorService operatorService, IWebHostEnvironment env)
         {
             _categoryService = categoryService;
             _operatorService = operatorService;
+            _env = env;
         }
 
         
 
         [HttpPost("add-operator")]
-        public async Task<IActionResult> AddOperator([FromForm] OperatorRequest request)
+        public async Task<IActionResult> AddOperator([FromForm] OperatorRequest request, IFormFile? imageFile)
         {
+
+            string? imageUrl = null;
+
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "Uploads");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                imageUrl = Path.Combine("Uploads", "Operators", uniqueFileName).Replace("\\", "/");
+            }
+
+            request.ImageUrl = imageUrl;
             var result = await _operatorService.AddOperatorAsync(request);
             return Ok(result);
         }
@@ -45,7 +68,7 @@ namespace InsuranceManagement.API.Controllers
         }
 
         [HttpPut("operators/{id}")]
-        public async Task<IActionResult> UpdateOperator(Guid id, [FromBody] OperatorRequest request)
+        public async Task<IActionResult> UpdateOperator(Guid id, [FromForm] OperatorRequest request)
         {
             var updated = await _operatorService.UpdateOperatorAsync(id, request);
             if (!updated) return NotFound();
@@ -97,7 +120,7 @@ namespace InsuranceManagement.API.Controllers
         
 
         [HttpPut("categories/{id}")]
-        public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] CategoryRequest request)
+        public async Task<IActionResult> UpdateCategory(Guid id, [FromForm] CategoryRequest request)
         {
             var updated = await _categoryService.UpdateCategoryAsync(id, request);
             if (!updated) return NotFound();
