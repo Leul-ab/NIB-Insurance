@@ -3,12 +3,8 @@ using InsuranceManagement.Application.DTO.Responses;
 using InsuranceManagement.Application.Interfaces;
 using InsuranceManagement.Domain.Entities;
 using InsuranceManagement.Infrastructure.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InsuranceManagement.Infrastructure.Services
 {
@@ -20,95 +16,168 @@ namespace InsuranceManagement.Infrastructure.Services
         {
             _context = context;
         }
-        public async Task<CategoryResponse> AddCategoryAsync(CategoryRequest request)
+
+        // ------------------------- IMAGE HANDLING -------------------------
+
+        private async Task<string?> SaveCategoryImageAsync(IFormFile? imageFile)
         {
-            string? imageUrl = null;
-            if(request.ImageFile != null && request.ImageFile.Length > 0)
-            {
-                var currentDir = Directory.GetCurrentDirectory();
-                var folderPath = Path.Combine(currentDir, "wwwroot", "Uploads", "Categories");
-                Directory.CreateDirectory(folderPath);
+            if (imageFile == null || imageFile.Length == 0)
+                return null;
 
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.ImageFile.FileName);
-                var filePath = Path.Combine(folderPath, fileName);
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", "Categories");
+            Directory.CreateDirectory(folderPath);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await request.ImageFile.CopyToAsync(stream);
-                }
+            var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+            var filePath = Path.Combine(folderPath, fileName);
 
-                imageUrl = Path.Combine("Uploads", "Categories", fileName).Replace("\\", "/");
-            }
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await imageFile.CopyToAsync(stream);
 
-            var category = new OperatorCategory
+            return Path.Combine("Uploads", "Categories", fileName).Replace("\\", "/");
+        }
+
+        private void DeleteCategoryImage(string? imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return;
+
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl);
+
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
+        }
+
+        // ------------------------- MAIN CATEGORY -------------------------
+
+        public async Task<CategoryResponse> AddMainCategoryAsync(CategoryRequest request)
+        {
+            // Prevent duplicate names
+            if (await _context.OperatorCategories.AnyAsync(c => c.Name == request.Name && c.ParentId == null))
+                throw new InvalidOperationException("Main category name already exists.");
+
+            var imageUrl = await SaveCategoryImageAsync(request.ImageFile);
+
+            var mainCategory = new OperatorCategory
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 Description = request.Description,
                 ImageUrl = imageUrl,
                 CreatedAt = DateTime.UtcNow,
-                IsActive = true
+                IsActive = true,
+                ParentId = null,       // Main category
+                FullInsurancePercentage = null,    // Main category has no price
+                ThirdPartyPercentage = null,
+                HalfLifePrice = null,
+                FullLifePrice =null
             };
 
-            _context.OperatorCategories.Add(category);
+            _context.OperatorCategories.Add(mainCategory);
             await _context.SaveChangesAsync();
 
             return new CategoryResponse
             {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description,
-                ImageUrl = category.ImageUrl
+                Id = mainCategory.Id,
+                Name = mainCategory.Name,
+                Description = mainCategory.Description,
+                ImageUrl = mainCategory.ImageUrl,
+                CreatedAt = mainCategory.CreatedAt,
+                IsActive = mainCategory.IsActive
             };
         }
 
-        public async Task<(bool deleted, List<string> affectedOperators)> DeleteCategoryAsync(Guid id, bool forceDelete = false)
+        // ------------------------- SUBCATEGORY -------------------------
+
+        public async Task<CategoryResponse> AddSubCategoryAsync(Guid parentCategoryId, CategoryRequest request)
         {
-            var category = await _context.OperatorCategories
-                .Include(c => c.Operators)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var parent = await _context.OperatorCategories
+                .FirstOrDefaultAsync(c => c.Id == parentCategoryId && c.ParentId == null);
 
-            if (category == null)
-                return (false, new List<string>());
+            if (parent == null)
+                throw new InvalidOperationException("Parent main category not found.");
 
-            var assignedOperators = category.Operators.Select(o => o.FullName).ToList();
+            // Prevent duplicate
+            if (await _context.OperatorCategories.AnyAsync(c => c.Name == request.Name && c.ParentId == parentCategoryId))
+                throw new InvalidOperationException("Subcategory name already exists under this main category.");
 
-            if (assignedOperators.Any() && !forceDelete)
+            var imageUrl = await SaveCategoryImageAsync(request.ImageFile);
+
+            var subCategory = new OperatorCategory
             {
-                // Warn admin — return operator names but do not delete yet
-                return (false, assignedOperators);
-            }
+                Id = Guid.NewGuid(),
+                Name = request.Name,
+                Description = request.Description,
+                FullInsurancePercentage = request.FullInsurancePercentage,
+                ThirdPartyPercentage = request.ThirdPartyPercentage,
+                HalfLifePrice = request.HalfLifePrice,
+                FullLifePrice = request.FullLifePrice,
+                ImageUrl = imageUrl,
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true,
+                ParentId = parentCategoryId
+            };
 
-            // Unassign operators
-            foreach (var op in category.Operators.ToList())
-            {
-                op.Categories.Remove(category);
-            }
-
-            _context.OperatorCategories.Remove(category);
+            _context.OperatorCategories.Add(subCategory);
             await _context.SaveChangesAsync();
 
-            return (true, assignedOperators);
+            return new CategoryResponse
+            {
+                Id = subCategory.Id,
+                Name = subCategory.Name,
+                Description = subCategory.Description,
+                FullInsurancePercentage = subCategory.FullInsurancePercentage,
+                ThirdPartyPercentage = subCategory.ThirdPartyPercentage,
+                HalfLifePrice = subCategory.HalfLifePrice,
+                FullLifePrice = subCategory.FullLifePrice,
+                ImageUrl = subCategory.ImageUrl,
+                CreatedAt = subCategory.CreatedAt,
+                IsActive = subCategory.IsActive
+            };
         }
 
-        public async Task<IEnumerable<CategoryResponse>> GetAllCategoriesAsync()
+        // ------------------------- FETCHING -------------------------
+
+        public async Task<IEnumerable<CategoryResponse>> GetAllMainCategoriesAsync()
         {
-            var categories = await _context.OperatorCategories.ToListAsync();
+            var categories = await _context.OperatorCategories
+                .Where(c => c.ParentId == null)
+                .ToListAsync();
 
             return categories.Select(c => new CategoryResponse
             {
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
+                ImageUrl = c.ImageUrl,
+                CreatedAt = c.CreatedAt,
                 IsActive = c.IsActive
+            });
+        }
+
+        public async Task<IEnumerable<CategoryResponse>> GetSubCategoriesAsync(Guid parentId)
+        {
+            var subcategories = await _context.OperatorCategories
+                .Where(c => c.ParentId == parentId)
+                .ToListAsync();
+
+            return subcategories.Select(c => new CategoryResponse
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                ImageUrl = c.ImageUrl,
+                FullInsurancePercentage = c.FullInsurancePercentage,
+                ThirdPartyPercentage = c.ThirdPartyPercentage,
+                HalfLifePrice = c.HalfLifePrice,
+                FullLifePrice = c.FullLifePrice,
+                IsActive = c.IsActive,
+                CreatedAt = c.CreatedAt
             });
         }
 
         public async Task<CategoryResponse?> GetCategoryByIdAsync(Guid id)
         {
-            var category = await _context.OperatorCategories
-                .FirstOrDefaultAsync(c => c.Id == id);
-
+            var category = await _context.OperatorCategories.FirstOrDefaultAsync(c => c.Id == id);
             if (category == null) return null;
 
             return new CategoryResponse
@@ -116,21 +185,91 @@ namespace InsuranceManagement.Infrastructure.Services
                 Id = category.Id,
                 Name = category.Name,
                 Description = category.Description,
-                IsActive = category.IsActive
+                ImageUrl = category.ImageUrl,
+                FullInsurancePercentage = category.FullInsurancePercentage,
+                ThirdPartyPercentage = category.ThirdPartyPercentage,
+                HalfLifePrice = category.HalfLifePrice,
+                FullLifePrice = category.FullLifePrice,
+                CreatedAt = category.CreatedAt,
+                IsActive = category.IsActive,
+                ParentId = category.ParentId
             };
         }
+
+        // ------------------------- UPDATE CATEGORY -------------------------
 
         public async Task<bool> UpdateCategoryAsync(Guid id, CategoryRequest request)
         {
             var category = await _context.OperatorCategories.FindAsync(id);
             if (category == null) return false;
 
+            // Check duplicate names
+            if (await _context.OperatorCategories.AnyAsync(c =>
+                c.Name == request.Name && c.Id != id && c.ParentId == category.ParentId))
+            {
+                throw new InvalidOperationException("Category name already exists.");
+            }
+
             category.Name = request.Name;
             category.Description = request.Description;
             category.IsActive = request.IsActive;
 
+            // Only subcategories can update price
+            if (category.ParentId != null)
+                category.FullInsurancePercentage = request.FullInsurancePercentage;
+
+            if (request.ImageFile != null && request.ImageFile.Length > 0)
+            {
+                DeleteCategoryImage(category.ImageUrl);
+                category.ImageUrl = await SaveCategoryImageAsync(request.ImageFile);
+            }
+
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        // ------------------------- DELETE -------------------------
+
+        public async Task<(bool deleted, List<string> warnings)> DeleteCategoryAsync(Guid id, bool forceDelete = false)
+        {
+            var category = await _context.OperatorCategories
+                .Include(c => c.SubCategories)
+                .Include(c => c.Operators)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (category == null)
+                return (false, new List<string>());
+
+            var warnings = new List<string>();
+
+            // MAIN CATEGORY WITH SUBCATEGORIES
+            if (category.ParentId == null && category.SubCategories.Any() && !forceDelete)
+            {
+                warnings.Add("Main category has subcategories.");
+                return (false, warnings);
+            }
+
+            // SUBCATEGORY ASSIGNED TO OPERATORS
+            if (category.Operators.Any() && !forceDelete)
+            {
+                warnings.Add("Subcategory is assigned to operators.");
+                return (false, warnings);
+            }
+
+            // Delete subcategories first
+            foreach (var sub in category.SubCategories.ToList())
+            {
+                DeleteCategoryImage(sub.ImageUrl);
+                _context.OperatorCategories.Remove(sub);
+            }
+
+            // Delete category image
+            DeleteCategoryImage(category.ImageUrl);
+
+            _context.OperatorCategories.Remove(category);
+            await _context.SaveChangesAsync();
+
+            return (true, warnings);
         }
     }
 }

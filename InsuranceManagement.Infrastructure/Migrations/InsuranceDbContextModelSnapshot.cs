@@ -22,42 +22,166 @@ namespace InsuranceManagement.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Client", b =>
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Announcement", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FullName")
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("SystemWide")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("LogoImageUrl")
+                    b.Property<string>("TargetGroup")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("MobliePhone")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Clients");
+                    b.ToTable("Announcements");
                 });
 
-            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Operator", b =>
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.ClaimR", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("ApprovedAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ApprovedByManagerAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("ApprovedByManagerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ClaimReason")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientEmail")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientFatherName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientFirstName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClientGrandFatherName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("DeathCertificatePdf")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EvidenceImagesJson")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("FinanceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("HospitalDischargeSummaryPdf")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HospitalName")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("IncidentDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<TimeSpan?>("IncidentTime")
+                        .HasColumnType("interval");
+
+                    b.Property<int?>("IncidentType")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("LifeInsuranceApplicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
+                    b.Property<string>("MedicalReportPdf")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("MotorInsuranceApplicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("OperatorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("PayoutFailureReason")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PayoutReference")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PayoutStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RejectReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RejectedByManagerAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("RejectedByManagerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TrafficPoliceReportPdfUrl")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("FinanceId");
+
+                    b.HasIndex("LifeInsuranceApplicationId");
+
+                    b.HasIndex("MotorInsuranceApplicationId");
+
+                    b.HasIndex("OperatorId");
+
+                    b.ToTable("Claims");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Client", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -68,29 +192,41 @@ namespace InsuranceManagement.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("FullName")
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("FatherName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GrandFatherName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<double>("Latitude")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("LogoImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NationalIdOrPassport")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<double>("Longitude")
-                        .HasColumnType("double precision");
+                    b.Property<string>("PassportOrNationalIdImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
 
-                    b.Property<string>("MobilePhone")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -110,6 +246,411 @@ namespace InsuranceManagement.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
+                    b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Finance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("FatherName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GrandFatherName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LogoImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NationalIdOrPassport")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubCity")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Finances");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.LifeInsuranceApplication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Age")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<float>("Height")
+                        .HasColumnType("real");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("LifeInsuranceType")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("LifePrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentReference")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SecretKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SubCategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Weight")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("SubCategoryId");
+
+                    b.ToTable("LifeInsuranceApplications");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.LifeInsuranceBeneficiary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("LifeInsuranceApplicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("NationalIdFilePath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Relation")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LifeInsuranceApplicationId");
+
+                    b.ToTable("Beneficiaries");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Manager", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("FatherName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GrandFatherName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LogoImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NationalIdOrPassport")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubCity")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Managers");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.MotorInsuranceApplication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("CalculatedPremium")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("CarImagePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CarLibreImagePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ChassisNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("EngineNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("InsuranceType")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("MarketPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentReference")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PlateNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SubCategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("YearOfManufacture")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("SubCategoryId");
+
+                    b.ToTable("MotorInsuranceApplications");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.News", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("News");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Operator", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ApprovedByOperatorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("FatherName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GrandFatherName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LogoImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NationalIdOrPassport")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubCity")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedByOperatorId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
                     b.ToTable("Operators");
                 });
 
@@ -120,11 +661,19 @@ namespace InsuranceManagement.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal?>("FullInsurancePercentage")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("FullLifePrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("HalfLifePrice")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
@@ -136,7 +685,15 @@ namespace InsuranceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("ThirdPartyPercentage")
+                        .HasColumnType("numeric");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
 
                     b.ToTable("OperatorCategories");
                 });
@@ -148,7 +705,7 @@ namespace InsuranceManagement.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -157,21 +714,21 @@ namespace InsuranceManagement.Infrastructure.Migrations
                     b.Property<bool>("IsOtpVerified")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("OtpGeneratedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("OtpCode")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("OtpExpiry")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PasswordResetOtp")
                         .HasColumnType("text");
 
                     b.Property<string>("RefreshToken")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("RefreshTokenExpiresAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("Role")
                         .HasColumnType("integer");
@@ -200,24 +757,164 @@ namespace InsuranceManagement.Infrastructure.Migrations
                     b.ToTable("OperatorOperatorCategories", (string)null);
                 });
 
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.ClaimR", b =>
+                {
+                    b.HasOne("InsuranceManagement.Domain.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InsuranceManagement.Domain.Entities.Finance", "Finance")
+                        .WithMany()
+                        .HasForeignKey("FinanceId");
+
+                    b.HasOne("InsuranceManagement.Domain.Entities.LifeInsuranceApplication", "LifeInsuranceApplication")
+                        .WithMany()
+                        .HasForeignKey("LifeInsuranceApplicationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("InsuranceManagement.Domain.Entities.MotorInsuranceApplication", "MotorInsuranceApplication")
+                        .WithMany()
+                        .HasForeignKey("MotorInsuranceApplicationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("InsuranceManagement.Domain.Entities.Operator", "Operator")
+                        .WithMany()
+                        .HasForeignKey("OperatorId");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Finance");
+
+                    b.Navigation("LifeInsuranceApplication");
+
+                    b.Navigation("MotorInsuranceApplication");
+
+                    b.Navigation("Operator");
+                });
+
             modelBuilder.Entity("InsuranceManagement.Domain.Entities.Client", b =>
                 {
                     b.HasOne("InsuranceManagement.Domain.Entities.User", "User")
                         .WithOne("Client")
-                        .HasForeignKey("InsuranceManagement.Domain.Entities.Client", "UserId");
+                        .HasForeignKey("InsuranceManagement.Domain.Entities.Client", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Finance", b =>
+                {
+                    b.HasOne("InsuranceManagement.Domain.Entities.User", "User")
+                        .WithOne("Finance")
+                        .HasForeignKey("InsuranceManagement.Domain.Entities.Finance", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.LifeInsuranceApplication", b =>
+                {
+                    b.HasOne("InsuranceManagement.Domain.Entities.OperatorCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InsuranceManagement.Domain.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InsuranceManagement.Domain.Entities.OperatorCategory", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("SubCategory");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.LifeInsuranceBeneficiary", b =>
+                {
+                    b.HasOne("InsuranceManagement.Domain.Entities.LifeInsuranceApplication", null)
+                        .WithMany("Beneficiaries")
+                        .HasForeignKey("LifeInsuranceApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.Manager", b =>
+                {
+                    b.HasOne("InsuranceManagement.Domain.Entities.User", "User")
+                        .WithOne("Manager")
+                        .HasForeignKey("InsuranceManagement.Domain.Entities.Manager", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.MotorInsuranceApplication", b =>
+                {
+                    b.HasOne("InsuranceManagement.Domain.Entities.OperatorCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InsuranceManagement.Domain.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InsuranceManagement.Domain.Entities.OperatorCategory", "SubCategory")
+                        .WithMany()
+                        .HasForeignKey("SubCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("SubCategory");
+                });
+
             modelBuilder.Entity("InsuranceManagement.Domain.Entities.Operator", b =>
                 {
+                    b.HasOne("InsuranceManagement.Domain.Entities.Operator", "ApprovedByOperator")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByOperatorId");
+
                     b.HasOne("InsuranceManagement.Domain.Entities.User", "User")
                         .WithOne("Operator")
                         .HasForeignKey("InsuranceManagement.Domain.Entities.Operator", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("ApprovedByOperator");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.OperatorCategory", b =>
+                {
+                    b.HasOne("InsuranceManagement.Domain.Entities.OperatorCategory", "Parent")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("OperatorOperatorCategory", b =>
@@ -235,9 +932,23 @@ namespace InsuranceManagement.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.LifeInsuranceApplication", b =>
+                {
+                    b.Navigation("Beneficiaries");
+                });
+
+            modelBuilder.Entity("InsuranceManagement.Domain.Entities.OperatorCategory", b =>
+                {
+                    b.Navigation("SubCategories");
+                });
+
             modelBuilder.Entity("InsuranceManagement.Domain.Entities.User", b =>
                 {
                     b.Navigation("Client");
+
+                    b.Navigation("Finance");
+
+                    b.Navigation("Manager");
 
                     b.Navigation("Operator");
                 });

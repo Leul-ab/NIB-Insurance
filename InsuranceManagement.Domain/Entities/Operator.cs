@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InsuranceManagement.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,25 +11,27 @@ namespace InsuranceManagement.Domain.Entities
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        public Operator? ApprovedByOperator { get; set; }
 
-        //Personal info
-        public string LogoImageUrl { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty;
-        public string MobilePhone { get; set; } = string.Empty;
-        public string? ImageUrl { get; set; }
-        public bool IsActive { get; set; } = false;
+        public string FirstName { get; set; }
+        public string FatherName { get; set; }
+        public string GrandFatherName { get; set; }
 
+        public DateTime DateOfBirth { get; set; }
 
-        //location
-        public string Region { get; set; } = string.Empty;
-        public string City { get; set; } = string.Empty;
-        public string SubCity { get; set; } = string.Empty;
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public string PhoneNumber { get; set; }
+        public string NationalIdOrPassport { get; set; }
+        public Gender? Gender { get; set; }
 
+        public string Region { get; set; }
+        public string City { get; set; }
+        public string SubCity { get; set; }
 
+        public string? LogoImageUrl { get; set; }
+        public bool IsActive { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
 
         public Guid UserId { get; set; }
         public User User { get; set; } = default!;

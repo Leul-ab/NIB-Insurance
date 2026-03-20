@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36301.6 d17.14
+VisualStudioVersion = 17.14.36301.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsuranceManagement.API", "InsuranceManagement.API\InsuranceManagement.API.csproj", "{04374310-D72F-49FB-975F-1CC930106465}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsuranceManagement.Domain", "InsuranceManagement.Domain\InsuranceManagement.Domain.csproj", "{B15DE8C4-A4D6-4C1D-9859-3A01AB957D61}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsuranceManagement.Infrastructure", "InsuranceManagement.Infrastructure\InsuranceManagement.Infrastructure.csproj", "{CAD88F42-58CE-465B-A2C2-E897934B16F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsuranceManagement.Tests", "InsuranceManagement.Tests\InsuranceManagement.Tests.csproj", "{F2C4A164-E3DF-4A61-9D7D-D010C1BAD1B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{CAD88F42-58CE-465B-A2C2-E897934B16F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAD88F42-58CE-465B-A2C2-E897934B16F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAD88F42-58CE-465B-A2C2-E897934B16F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C4A164-E3DF-4A61-9D7D-D010C1BAD1B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C4A164-E3DF-4A61-9D7D-D010C1BAD1B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C4A164-E3DF-4A61-9D7D-D010C1BAD1B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C4A164-E3DF-4A61-9D7D-D010C1BAD1B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

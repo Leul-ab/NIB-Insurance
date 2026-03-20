@@ -14,6 +14,10 @@ namespace InsuranceManagement.Application.DTO.Requests
         public string Name { get; set; } = null!;
 
         public string? Description { get; set; }
+        public decimal FullInsurancePercentage { get; set; }
+        public decimal ThirdPartyPercentage { get; set; }
+        public decimal HalfLifePrice { get; set; }
+        public decimal FullLifePrice { get; set; }
 
         public IFormFile? ImageFile { get; set; }
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using InsuranceManagement.Domain.Enums;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,10 +11,32 @@ namespace InsuranceManagement.Application.DTO.Responses
     public class ClientResponse
     {
         public Guid Id { get; set; }
-        public string FullName { get; set; } = default!;
-        public string Email { get; set; } = default!;
-        public string PasswordHash { get; set; } = default!;
-        public string MobliePhone { get; set; } = default!;
+
+        // Personal Info
+        public string FirstName { get; set; }
+        public string FatherName { get; set; }
+        public string GrandFatherName { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public Gender Gender { get; set; }
+        public string? LogoImageUrl { get; set; }
+
+        // Contact Info
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+
+        // Address Info
+        public string Region { get; set; }
+        public string City { get; set; }
+        public string SubCity { get; set; }
+
+        // Identification
+        public string NationalIdOrPassport { get; set; }
+
+        // Automatically generated
         public DateTime CreatedAt { get; set; }
+        public string PassportOrNationalIdImageUrl { get; set; }
+
+
     }
+
 }

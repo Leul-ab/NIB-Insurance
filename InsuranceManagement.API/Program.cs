@@ -1,9 +1,12 @@
 using InsuranceManagement.Application.Interfaces;
 using InsuranceManagement.Application.Services;
+using InsuranceManagement.Domain.Entities;
 using InsuranceManagement.Infrastructure.Data;
 using InsuranceManagement.Infrastructure.Seed;
 using InsuranceManagement.Infrastructure.Services;
+using InsuranceManagement.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -11,11 +14,26 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IOperatorService, OperatorService>();
 builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IFinanceService, FinanceService>();
+builder.Services.AddScoped<IManagerService, ManagerService>();
 builder.Services.AddScoped<PasswordHasherService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
 
 // Controllers
 builder.Services.AddControllers()
@@ -23,6 +41,9 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
+
+
+
 
 // PostgreSQL
 builder.Services.AddDbContext<InsuranceDbContext>(options =>
@@ -49,7 +70,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "ArifMenu API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "NIB Insurance API", Version = "v1" });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -78,13 +99,22 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy
+            .AllowAnyOrigin() // ?? In production, restrict this to frontend domain
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<InsuranceDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
-    await AdminSeeder.SeedAdminAsync(dbContext, "admin", "admin@arifmenu.com", "Admin123!");
+    await AdminSeeder.SeedAdminAsync(dbContext, "admin", "admin@gmail.com", "Admin123!");
 }
 
 if (app.Environment.IsDevelopment())
@@ -95,6 +125,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseAuthentication();
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 app.MapControllers();
 

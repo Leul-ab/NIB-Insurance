@@ -1,20 +1,26 @@
 ﻿using InsuranceManagement.Application.DTO.Requests;
 using InsuranceManagement.Application.DTO.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InsuranceManagement.Application.Interfaces
 {
     public interface ICategoryService
     {
-        Task<CategoryResponse> AddCategoryAsync(CategoryRequest request);
-        Task<IEnumerable<CategoryResponse>> GetAllCategoriesAsync();
+        // -------------------- MAIN CATEGORY --------------------
+        Task<CategoryResponse> AddMainCategoryAsync(CategoryRequest request);
+        Task<IEnumerable<CategoryResponse>> GetAllMainCategoriesAsync();
+
+        // -------------------- SUBCATEGORY --------------------
+        Task<CategoryResponse> AddSubCategoryAsync(Guid parentCategoryId, CategoryRequest request);
+        Task<IEnumerable<CategoryResponse>> GetSubCategoriesAsync(Guid parentId);
+
+        // -------------------- COMMON METHODS --------------------
         Task<CategoryResponse?> GetCategoryByIdAsync(Guid id);
         Task<bool> UpdateCategoryAsync(Guid id, CategoryRequest request);
-        Task<(bool deleted, List<string> affectedOperators)> DeleteCategoryAsync(Guid id, bool forceDelete = false);
 
+        /// <summary>
+        /// Delete category or subcategory.
+        /// returns (deleted: bool, warnings: list<string>)
+        /// </summary>
+        Task<(bool deleted, List<string> warnings)> DeleteCategoryAsync(Guid id, bool forceDelete = false);
     }
 }

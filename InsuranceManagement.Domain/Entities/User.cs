@@ -16,12 +16,16 @@ namespace InsuranceManagement.Domain.Entities
         public UserRole Role { get; set; }
         public Operator? Operator { get; set; }
         public Client? Client { get; set; }
+        public Finance? Finance { get; set; }
+        public Manager? Manager { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 
-        public string? PasswordResetOtp { get; set; }
-        public DateTime? OtpGeneratedAt { get; set; }
-        public bool IsOtpVerified { get; set; } = false;
+        public string? OtpCode { get; set; }
+        public DateTime? OtpExpiry { get; set; }
+        //public string? PasswordResetOtp { get; set; }
+        //public DateTime? OtpGeneratedAt { get; set; }
+        public bool IsOtpVerified { get; set; }
 
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiresAt { get; set; }
