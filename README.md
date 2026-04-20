@@ -147,6 +147,7 @@ https://localhost:<port>/swagger
 
 ## Authentication
 
+*Username "admin@gmail.com",  Password "Admin123!"
 This project uses **JWT-based authentication** to secure endpoints and manage user roles.
 
 ---
