@@ -1,5 +1,13 @@
 # NIB Insurance Management System API
 
+## 🚀 Live Deployment
+
+The API is deployed and running on Render:
+
+🔗 Base URL: https://nib-insurance-1.onrender.com  
+📘 Swagger Documentation: https://nib-insurance-1.onrender.com/swagger/index.html
+
+
 ## Overview
 
 **NIB Insurance Management System** is a backend Web API built using ASP.NET Core to digitize and streamline insurance operations.
