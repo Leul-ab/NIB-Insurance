@@ -1,4 +1,4 @@
-﻿using InsuranceManagement.Application.DTO.Requests;
+using InsuranceManagement.Application.DTO.Requests;
 using InsuranceManagement.Application.DTO.Responses;
 using InsuranceManagement.Application.Interfaces;
 using InsuranceManagement.Domain.Entities;
@@ -16,11 +16,13 @@ namespace InsuranceManagement.Infrastructure.Services
     {
         private readonly InsuranceDbContext _context;
         private readonly IEmailService _emailService;
+        private readonly IFileStorageService _fileStorage;
 
-        public ClientService(InsuranceDbContext context, IEmailService emailService)
+        public ClientService(InsuranceDbContext context, IEmailService emailService, IFileStorageService fileStorage)
         {
             _context = context;
             _emailService = emailService;
+            _fileStorage = fileStorage;
         }
         public async Task<ClientResponse> RegisterClientAsync(ClientRegisterRequest request)
         {
@@ -952,24 +954,10 @@ namespace InsuranceManagement.Infrastructure.Services
             return 150000m; // older than 1990
         }
 
-        private async Task<string> SaveFileAsync(IFormFile file, string folderName)
+        private async Task<string?> SaveFileAsync(IFormFile? file, string folderName)
         {
-            if (file == null || file.Length == 0)
-                return null;
-
-            string uploadsFolder = Path.Combine("wwwroot", folderName);
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            string uniqueFileName = Guid.NewGuid() + "_" + file.FileName;
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return $"/{folderName}/{uniqueFileName}";
+            // Delegates to Cloudinary — returns a permanent HTTPS URL
+            return await _fileStorage.UploadAsync(file, folderName);
         }
 
         private string GenerateSecretKey()

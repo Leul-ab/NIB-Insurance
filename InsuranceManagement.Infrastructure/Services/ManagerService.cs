@@ -1,4 +1,4 @@
-﻿using InsuranceManagement.Application.DTO.Requests;
+using InsuranceManagement.Application.DTO.Requests;
 using InsuranceManagement.Application.DTO.Responses;
 using InsuranceManagement.Application.Interfaces;
 using InsuranceManagement.Domain.Entities;
@@ -13,11 +13,13 @@ namespace InsuranceManagement.Infrastructure.Services
     {
         private readonly InsuranceDbContext _context;
         private readonly IEmailService _emailService;
+        private readonly IFileStorageService _fileStorage;
 
-        public ManagerService(InsuranceDbContext context, IEmailService emailService)
+        public ManagerService(InsuranceDbContext context, IEmailService emailService, IFileStorageService fileStorage)
         {
             _context = context;
             _emailService = emailService;
+            _fileStorage = fileStorage;
         }
 
         public async Task<ManagerResponse> AddManagerAsync(ManagerRequest request)
@@ -36,23 +38,8 @@ namespace InsuranceManagement.Infrastructure.Services
                 PasswordHash = passwordHasher.HashPassword(null, request.Password) // ✅ hash the actual password
             };
 
-            string? logoImageUrl = null;
-            if (request.LogoImageUrl != null && request.LogoImageUrl.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "managers");
-                Directory.CreateDirectory(uploadsFolder);
-
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(request.LogoImageUrl.FileName)}";
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await request.LogoImageUrl.CopyToAsync(stream);
-                }
-
-                // This is what you store in DB (relative URL is better)
-                logoImageUrl = $"/uploads/managers/{fileName}";
-            }
+            // Upload profile image to Cloudinary — returns permanent HTTPS URL
+            var logoImageUrl = await _fileStorage.UploadAsync(request.LogoImageUrl, "managers");
 
 
             var manager = new Manager

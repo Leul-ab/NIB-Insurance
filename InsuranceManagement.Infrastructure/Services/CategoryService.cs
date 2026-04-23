@@ -1,4 +1,4 @@
-﻿using InsuranceManagement.Application.DTO.Requests;
+using InsuranceManagement.Application.DTO.Requests;
 using InsuranceManagement.Application.DTO.Responses;
 using InsuranceManagement.Application.Interfaces;
 using InsuranceManagement.Domain.Entities;
@@ -11,40 +11,25 @@ namespace InsuranceManagement.Infrastructure.Services
     public class CategoryService : ICategoryService
     {
         private readonly InsuranceDbContext _context;
+        private readonly IFileStorageService _fileStorage;
 
-        public CategoryService(InsuranceDbContext context)
+        public CategoryService(InsuranceDbContext context, IFileStorageService fileStorage)
         {
             _context = context;
+            _fileStorage = fileStorage;
         }
 
         // ------------------------- IMAGE HANDLING -------------------------
 
         private async Task<string?> SaveCategoryImageAsync(IFormFile? imageFile)
         {
-            if (imageFile == null || imageFile.Length == 0)
-                return null;
-
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", "Categories");
-            Directory.CreateDirectory(folderPath);
-
-            var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
-            var filePath = Path.Combine(folderPath, fileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await imageFile.CopyToAsync(stream);
-
-            return Path.Combine("Uploads", "Categories", fileName).Replace("\\", "/");
+            // Uploads to Cloudinary — returns a permanent HTTPS URL
+            return await _fileStorage.UploadAsync(imageFile, "Categories");
         }
 
         private void DeleteCategoryImage(string? imageUrl)
         {
-            if (string.IsNullOrEmpty(imageUrl))
-                return;
-
-            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl);
-
-            if (File.Exists(fullPath))
-                File.Delete(fullPath);
+            // Files are managed by Cloudinary — no local deletion needed
         }
 
         // ------------------------- MAIN CATEGORY -------------------------

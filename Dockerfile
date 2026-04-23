@@ -1,26 +1,32 @@
-# Build Stage
+# =========================
+# BUILD STAGE
+# =========================
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+WORKDIR /app
 
-# Copy the entire solution and projects
-COPY . .
+# Copy solution/project files
+COPY . ./
 
 # Restore dependencies
-RUN dotnet restore "InsuranceManagement.sln"
+RUN dotnet restore InsuranceManagement.API/InsuranceManagement.API.csproj
 
-# Move into the API folder
-WORKDIR "/src/InsuranceManagement.API"
+# Build & publish the API project
+RUN dotnet publish InsuranceManagement.API/InsuranceManagement.API.csproj -c Release -o out
 
-# Build and Publish with warnings suppressed
-# This ignores CS8618 (nullability), CS8601/02/03 (null references), and CS8981 (naming)
-RUN dotnet publish "InsuranceManagement.API.csproj" -c Release -o /app/publish \
-    /p:NoWarn="CS8618;CS8601;CS8602;CS8603;CS8604;CS8613;CS8625;CS8629;CS8981" \
-    /p:TreatWarningsAsErrors=false
-
-# Run Stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# =========================
+# RUNTIME STAGE
+# =========================
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/publish .
 
-# The DLL name based on your project structure
-ENTRYPOINT ["dotnet", "InsuranceManagement.API.dll"]
+# Copy published output
+COPY --from=build /app/out .
+
+# Set environment to Production so appsettings.Production.json is loaded
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Expose port (Render will override via PORT env)
+EXPOSE 8080
+
+# Start app
+ENTRYPOINT ["dotnet", "InsuranceManagement.API.dll"]

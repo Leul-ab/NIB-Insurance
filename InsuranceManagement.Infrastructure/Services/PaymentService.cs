@@ -1,4 +1,4 @@
-﻿using InsuranceManagement.Application.DTO.Requests;
+using InsuranceManagement.Application.DTO.Requests;
 using InsuranceManagement.Application.DTO.Responses;
 using InsuranceManagement.Application.Interfaces;
 using InsuranceManagement.Domain.Entities;
@@ -17,6 +17,8 @@ namespace InsuranceManagement.Infrastructure.Services
     {
         private readonly InsuranceDbContext _context;
         private readonly string _chapaSecretKey;
+        private readonly string _chapaCallbackUrl;
+        private readonly string _chapaReturnUrl;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IEmailService _emailService;
 
@@ -24,6 +26,8 @@ namespace InsuranceManagement.Infrastructure.Services
         {
             _context = context;
             _chapaSecretKey = config["Chapa:SecretKey"];
+            _chapaCallbackUrl = config["Chapa:CallbackUrl"] ?? "https://your-backend.com/api/payments/chapa/callback";
+            _chapaReturnUrl = config["Chapa:ReturnUrl"] ?? "https://your-frontend.com/payment-success";
             _passwordHasher = passwordHasher;
             _emailService = emailService;
         }
@@ -89,8 +93,8 @@ namespace InsuranceManagement.Infrastructure.Services
                 first_name = clientFirstName,
                 last_name = clientLastName,
                 tx_ref = reference,
-                callback_url = "https://your-backend.com/api/payments/chapa/callback",
-                return_url = "https://your-frontend.com/payment-success",
+                callback_url = _chapaCallbackUrl,
+                return_url = _chapaReturnUrl,
 
                 customization = new
                 {

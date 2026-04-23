@@ -361,3 +361,25 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# =============================================
+# SECURITY — Do NOT commit secrets to GitHub
+# =============================================
+
+# Contains real DB credentials / secrets
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# Uploaded user files (wwwroot) — ephemeral, not source code
+**/wwwroot/Uploads/
+**/wwwroot/CarImages/
+**/wwwroot/CarLibreImages/
+**/wwwroot/ClientDocs/
+**/wwwroot/ClaimEvidence/
+**/wwwroot/TrafficReports/
+**/wwwroot/LifeClaims/
+**/wwwroot/BeneficiaryNationalIds/
+**/wwwroot/DeathCertificatePdf/
+**/wwwroot/HospitalDischargeSummaryPdf/
+**/wwwroot/MedicalReportPdf/
+**/wwwroot/uploads/
