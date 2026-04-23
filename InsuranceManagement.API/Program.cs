@@ -176,5 +176,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGet("/", (HttpContext context) => Results.Redirect("/swagger"));
 
 app.Run();
